@@ -9,7 +9,7 @@ public class TileData
 
 
 	private Vector3 type = new Vector3 ();
-	private int height = 0;
+	private float height = 0;
 	private Coords coordinates;
 
 	public Coords Coordinates { get { return coordinates; } }
@@ -19,16 +19,16 @@ public class TileData
 		get { return type; }
 		set
 		{
-			type = value.normalized;
+			type = value;
 		}
 	}
 
-	public int Height
+	public float Height
 	{ 
 		get { return height; }
 		set
 		{
-			if ( value >= 0 && value <= HEIGHT_MAX )
+			//if ( value >= 0 && value <= HEIGHT_MAX )
 			{
 				height = value;
 			}

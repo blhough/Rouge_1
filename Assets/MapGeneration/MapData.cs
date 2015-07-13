@@ -30,12 +30,29 @@ public class MapData
 
     public void Generate()
     {
-        int numBiomes = Random.Range( 5 , 12 );
+        int numBiomes = Random.Range( 3 , 10 );
         Biome[] biomes = new Biome[ numBiomes ];
 
 		GenerateBiomes( ref biomes , numBiomes );     
         ExpandBiomes( ref biomes , numBiomes );
-		SmoothBiomes();
+		BlendBiomes();
+		BlendBiomes();
+		BlendBiomes();
+		BlendBiomes();
+		BlendBiomes();
+		BlendBiomes();
+//		BlendBiomes();
+//		BlendBiomes();
+//		BlendBiomes();
+//		BlendBiomes();
+//		BlendBiomes();
+//		BlendBiomes();
+//		BlendBiomes();
+//		BlendBiomes();
+//		BlendBiomes();
+//		BlendBiomes();
+
+
     }
 
     private void Init()
@@ -59,16 +76,16 @@ public class MapData
 	{
 		Vector3[] primaryTypes = new Vector3[ 3 ];
 
-		primaryTypes[ 0 ] = new Vector3( 1 , 0 , 0 );
-		primaryTypes[ 1 ] = new Vector3( 0 , 1 , 0 );
-		primaryTypes[ 2 ] = new Vector3( 0 , 0 , 1 );
+		primaryTypes[ 0 ] = new Vector3( 1f , 0f , 0f );
+		primaryTypes[ 1 ] = new Vector3( 0f , 1f , 0f );
+		primaryTypes[ 2 ] = new Vector3( 0f , 0f , 1f );
 		
         for (int i = 0; i < numBiomes; i++) 
 		{
 	        biomes[ i ] = new Biome( 
 	            Random.Range( 0 , mapWidth ),
 	            Random.Range( 0 , mapHeight ),
-	            primaryTypes[ Random.Range( 0 , 2 ) ] // the types for the biomes
+	            primaryTypes[ Random.Range( 0 , 3 ) ] // the types for the biomes
 	        );
 		}
 	}
@@ -103,7 +120,6 @@ public class MapData
                             if (  biomes[ ( k + offset ) % numBiomes ].IsInRadius( x , y )  ) 
                             {
                                 tile.Type = biomes[ ( k + offset ) % numBiomes ].Type;
-                                tile.Height = (int) biomes[ ( k + offset ) % numBiomes ].Type.x * 10;
                                 break;
                             }
                         }
@@ -113,15 +129,17 @@ public class MapData
         } while ( isMapFilled == false );
     }
 
-	private void SmoothBiomes()
-	{		
+	private void BlendBiomes()
+	{	
+		Vector3[,] smoothMap = new Vector3[ mapWidth , mapHeight ];
 		for ( int y = 0 ; y < mapHeight ; y++ )
 		{
 			for ( int x = 0 ; x < mapWidth ; x++ )
 			{
-				Vector3 average = new Vector3();
 				TileData tile = tileMap[ x , y ];
-				int count = 0;
+				Vector3 average = tile.Type;
+
+				float count = 1;
 
 				if ( MapHelper.isUp( x , y ) ) 
 				{
@@ -165,9 +183,21 @@ public class MapData
 				}
 
 				average /= count;
-				tileMap[ x , y ].Type = average;
+				average.x = Mathf.Clamp01( average.x );
+				average.y = Mathf.Clamp01( average.y );
+				average.z = Mathf.Clamp01( average.z );
+
+				smoothMap[ x , y ] = average.normalized;
 			}
-		}		
+		}	
+
+		for ( int y = 0 ; y < mapHeight ; y++ )
+		{
+			for ( int x = 0 ; x < mapWidth ; x++ )
+			{
+				tileMap[ x , y ].Type = smoothMap[ x , y ]; 
+			}
+		}
 	}
 
 

@@ -8,7 +8,7 @@ public class MapController : MonoBehaviour
 	private MapData map;
 	public int mapWidth = 10 , mapHeight = 10;
 	public int tileWidth = 10 , tileHeight = 10;
-	public int numTextures = 8;
+	public int numTextures = 1;
 
 	public GameObject meshPrefab;
 	private GameObject[,] meshObjects;
@@ -67,9 +67,20 @@ public class MapController : MonoBehaviour
 			{
 				int tileIndex = ( y * mapHeight + x ) * 3;
 
-				float z = -1 - map.GetTileAt ( x , y ).Height;
-
+				float z = -1f - map.GetTileAt ( x , y ).Height;
+				z = -1f;
 				Triangle face = new Triangle ( x , y );
+
+				Vector2 uvModifier = ( (Vector2) map.GetTileAt ( x , y ).Type );
+				uvModifier.y /= 5f;
+				uvModifier.y = Mathf.Clamp( uvModifier.y , 0.001f , 0.199f );
+				uvModifier.x = Mathf.Clamp( uvModifier.x , 0.001f , 0.999f );
+
+				uvModifier.y += 0.2f * Mathf.Clamp( Mathf.Floor ( map.GetTileAt ( x , y ).Type.z / 0.2f ) , 0 , 4 );
+
+				uvModifier.y = Mathf.Clamp( uvModifier.y , 0.001f , 0.999f );
+
+				//uvModifier += new Vector2( 0.5f , 0.5f );
                 
 				if ( MapHelper.isUp( x , y ) )
 				{
@@ -77,9 +88,9 @@ public class MapController : MonoBehaviour
 					face.vertices [ 1 ] = new Vector3 ( ( x ) * tileWidth , ( y + 1 ) * tileHeight , z );
 					face.vertices [ 2 ] = new Vector3 ( ( x + 2 ) * tileWidth , ( y + 1 ) * tileHeight , z );
                     
-					face.uvs [ 0 ] = new Vector2 ( ( 0.5f + map.GetTileAt ( x , y ).Type.x ) / numTextures , 0 );
-					face.uvs [ 1 ] = new Vector2 ( ( 0f + map.GetTileAt ( x , y ).Type.y ) / numTextures , 1 );
-					face.uvs [ 2 ] = new Vector2 ( ( 1f + map.GetTileAt ( x , y ).Type.z ) / numTextures , 1 );
+					face.uvs [ 0 ] = uvModifier;
+					face.uvs [ 1 ] = uvModifier;
+					face.uvs [ 2 ] = uvModifier;
                     
                     
                     
@@ -90,9 +101,9 @@ public class MapController : MonoBehaviour
 					face.vertices [ 1 ] = new Vector3 ( ( x + 1 ) * tileWidth , ( y + 1 ) * tileHeight , z );
 					face.vertices [ 2 ] = new Vector3 ( ( x + 2 ) * tileWidth , ( y ) * tileHeight , z );
                     
-					face.uvs [ 0 ] = new Vector2 ( ( 1f + map.GetTileAt ( x , y ).Type.x ) / numTextures , 0 );
-					face.uvs [ 1 ] = new Vector2 ( ( 0.5f + map.GetTileAt ( x , y ).Type.y ) / numTextures , 1 );
-					face.uvs [ 2 ] = new Vector2 ( ( 0f + map.GetTileAt ( x , y ).Type.z ) / numTextures , 0 );
+					face.uvs [ 0 ] = uvModifier;
+					face.uvs [ 1 ] = uvModifier;
+					face.uvs [ 2 ] = uvModifier;
 				}
                 
 				face.normals [ 2 ] = Vector3.forward;
