@@ -3,26 +3,23 @@ using System.Collections;
 
 public class TileData
 {
-	private const int TYPE_MAX = 8;
+	//private const int TYPE_MAX = 8;
 	private const int HEIGHT_MAX = 100;
 
 
 
-	private int type = -1;
+	private Vector3 type = new Vector3 ();
 	private int height = 0;
 	private Coords coordinates;
 
 	public Coords Coordinates { get { return coordinates; } }
 
-	public int Type
+	public Vector3 Type
 	{ 
 		get { return type; }
 		set
 		{
-			if ( value >= 0 && value <= TYPE_MAX )
-			{
-				type = value;
-			}
+			type = value.normalized;
 		}
 	}
 

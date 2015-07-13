@@ -66,21 +66,20 @@ public class MapController : MonoBehaviour
 			for ( int x=0 ; x < mapWidth ; x++ )
 			{
 				int tileIndex = ( y * mapHeight + x ) * 3;
-				bool isUp = ( x + y ) % 2 == 0;
 
 				float z = -1 - map.GetTileAt ( x , y ).Height;
 
 				Triangle face = new Triangle ( x , y );
                 
-				if ( isUp )
+				if ( MapHelper.isUp( x , y ) )
 				{
 					face.vertices [ 0 ] = new Vector3 ( ( x + 1 ) * tileWidth , y * tileHeight , z );
 					face.vertices [ 1 ] = new Vector3 ( ( x ) * tileWidth , ( y + 1 ) * tileHeight , z );
 					face.vertices [ 2 ] = new Vector3 ( ( x + 2 ) * tileWidth , ( y + 1 ) * tileHeight , z );
                     
-					face.uvs [ 0 ] = new Vector2 ( ( 0.5f + map.GetTileAt ( x , y ).Type ) / numTextures , 0 );
-					face.uvs [ 1 ] = new Vector2 ( ( 0f + map.GetTileAt ( x , y ).Type ) / numTextures , 1 );
-					face.uvs [ 2 ] = new Vector2 ( ( 1f + map.GetTileAt ( x , y ).Type ) / numTextures , 1 );
+					face.uvs [ 0 ] = new Vector2 ( ( 0.5f + map.GetTileAt ( x , y ).Type.x ) / numTextures , 0 );
+					face.uvs [ 1 ] = new Vector2 ( ( 0f + map.GetTileAt ( x , y ).Type.y ) / numTextures , 1 );
+					face.uvs [ 2 ] = new Vector2 ( ( 1f + map.GetTileAt ( x , y ).Type.z ) / numTextures , 1 );
                     
                     
                     
@@ -91,9 +90,9 @@ public class MapController : MonoBehaviour
 					face.vertices [ 1 ] = new Vector3 ( ( x + 1 ) * tileWidth , ( y + 1 ) * tileHeight , z );
 					face.vertices [ 2 ] = new Vector3 ( ( x + 2 ) * tileWidth , ( y ) * tileHeight , z );
                     
-					face.uvs [ 0 ] = new Vector2 ( ( 1f + map.GetTileAt ( x , y ).Type ) / numTextures , 0 );
-					face.uvs [ 1 ] = new Vector2 ( ( 0.5f + map.GetTileAt ( x , y ).Type ) / numTextures , 1 );
-					face.uvs [ 2 ] = new Vector2 ( ( 0f + map.GetTileAt ( x , y ).Type ) / numTextures , 0 );
+					face.uvs [ 0 ] = new Vector2 ( ( 1f + map.GetTileAt ( x , y ).Type.x ) / numTextures , 0 );
+					face.uvs [ 1 ] = new Vector2 ( ( 0.5f + map.GetTileAt ( x , y ).Type.y ) / numTextures , 1 );
+					face.uvs [ 2 ] = new Vector2 ( ( 0f + map.GetTileAt ( x , y ).Type.z ) / numTextures , 0 );
 				}
                 
 				face.normals [ 2 ] = Vector3.forward;
