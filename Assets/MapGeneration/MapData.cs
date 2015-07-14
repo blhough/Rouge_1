@@ -30,17 +30,18 @@ public class MapData
 
     public void Generate()
     {
-        int numBiomes = Random.Range( 3 , 10 );
+        int numBiomes = Random.Range(4  , 15 );
         Biome[] biomes = new Biome[ numBiomes ];
 
 		GenerateBiomes( ref biomes , numBiomes );     
         ExpandBiomes( ref biomes , numBiomes );
-		BlendBiomes();
-		BlendBiomes();
-		BlendBiomes();
-		BlendBiomes();
-		BlendBiomes();
-		BlendBiomes();
+
+		RepeatBlendBiomes( 30 );
+
+		SmoothBiomes();
+
+
+		//RepeatBlendBiomes( 1 );
 //		BlendBiomes();
 //		BlendBiomes();
 //		BlendBiomes();
@@ -131,7 +132,7 @@ public class MapData
 
 	private void BlendBiomes()
 	{	
-		Vector3[,] smoothMap = new Vector3[ mapWidth , mapHeight ];
+		Vector3[,] blendMap = new Vector3[ mapWidth , mapHeight ];
 		for ( int y = 0 ; y < mapHeight ; y++ )
 		{
 			for ( int x = 0 ; x < mapWidth ; x++ )
@@ -139,7 +140,7 @@ public class MapData
 				TileData tile = tileMap[ x , y ];
 				Vector3 average = tile.Type;
 
-				float count = 1;
+				int count = 1;
 
 				if ( MapHelper.isUp( x , y ) ) 
 				{
@@ -187,7 +188,7 @@ public class MapData
 				average.y = Mathf.Clamp01( average.y );
 				average.z = Mathf.Clamp01( average.z );
 
-				smoothMap[ x , y ] = average.normalized;
+				blendMap[ x , y ] = average.normalized;
 			}
 		}	
 
@@ -195,7 +196,104 @@ public class MapData
 		{
 			for ( int x = 0 ; x < mapWidth ; x++ )
 			{
-				tileMap[ x , y ].Type = smoothMap[ x , y ]; 
+				tileMap[ x , y ].Type = blendMap[ x , y ]; 
+			}
+		}
+	}
+
+	private void RepeatBlendBiomes( int reps )
+	{
+		for (int i = 0; i < reps; i++) {
+			BlendBiomes();
+		}
+	}
+
+	private void SmoothBiomes()
+	{
+		float xCoef = Random.Range( 4f , 30f );
+		float yCoef = Random.Range( 4f , 30f );
+		float scale = Random.Range( 2f , 3.2f );
+
+
+		for ( int y = 0 ; y < mapHeight ; y++ )
+		{
+			for ( int x = 0 ; x < mapWidth ; x++ )
+			{
+
+				float offset = Mathf.Pow( Mathf.Sin( x / xCoef ) * Mathf.Sin( y / yCoef ) , 2 ) / scale;
+
+				Vector3 temp = tileMap[ x , y ].Type;
+				temp.x = Mathf.Round( Mathf.Clamp01( temp.x + offset ) );
+				temp.y = Mathf.Round( Mathf.Clamp01( temp.y + offset ) );
+				temp.z = Mathf.Round( Mathf.Clamp01( temp.z + offset ) );
+				tileMap[ x , y ].Type = temp;
+			}
+		}
+
+		Vector3[,] smoothMap = new Vector3[ mapWidth , mapHeight ];
+
+		for ( int y = 0 ; y < mapHeight ; y++ )
+		{
+			for ( int x = 0 ; x < mapWidth ; x++ )
+			{
+				smoothMap[ x , y ] = tileMap[ x , y ].Type;
+	
+				if ( MapHelper.isUp( x , y ) ) 
+				{
+					if ( x - 1 >= 0 && x + 1 < mapWidth ) 
+					{
+						if ( tileMap[ x - 1, y ].Type == tileMap[ x + 1, y ].Type ) 
+						{
+							tileMap[ x , y ].Type = tileMap[ x - 1 , y ].Type;
+						}
+					}
+					else if ( x + 1 < mapWidth && y - 1 >= 0 ) 
+					{
+						if ( tileMap[ x + 1, y ].Type == tileMap[ x , y - 1 ].Type ) 
+						{
+							tileMap[ x , y ].Type = tileMap[ x + 1 , y ].Type;
+						}
+					}
+					else if ( y - 1 >= 0 && x- 1 > 0 ) 
+					{
+						if ( tileMap[ x , y - 1 ].Type == tileMap[ x - 1, y ].Type ) 
+						{
+							tileMap[ x , y ].Type = tileMap[ x - 1 , y ].Type;
+						}
+					}
+				}
+				else
+				{
+					if ( x - 1 >= 0 && x + 1 < mapWidth ) 
+					{
+						if ( tileMap[ x - 1, y ].Type == tileMap[ x + 1, y ].Type ) 
+						{
+							tileMap[ x , y ].Type = tileMap[ x - 1 , y ].Type;
+						}
+					}
+					else if ( x + 1 < mapWidth && y + 1 < mapHeight ) 
+					{
+						if ( tileMap[ x + 1, y ].Type == tileMap[ x , y + 1 ].Type ) 
+						{
+							tileMap[ x , y ].Type = tileMap[ x + 1 , y ].Type;
+						}
+					}
+					else if ( y + 1 < mapHeight && x- 1 > 0 ) 
+					{
+						if ( tileMap[ x , y + 1 ].Type == tileMap[ x - 1, y ].Type ) 
+						{
+							tileMap[ x , y ].Type = tileMap[ x - 1 , y ].Type;
+						}
+					}
+				}
+			}
+		}	
+
+		for ( int y = 0 ; y < mapHeight ; y++ )
+		{
+			for ( int x = 0 ; x < mapWidth ; x++ )
+			{
+				//tileMap[ x , y ].Type = smoothMap[ x , y ]; 
 			}
 		}
 	}
